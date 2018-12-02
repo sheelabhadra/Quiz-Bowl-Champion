@@ -70,9 +70,10 @@ class DataPreprocessing:
 
 
 class Classifier:
-	def __init__(self, model, X_train, y_train):
+	def __init__(self, model, X_train, y_train, X_test):
 		self.X_train = X_train
 		self.y_train = y_train
+		self.X_test = X_test
 		self.model = model
 
 	def cv_scores(self, K=5):
@@ -89,6 +90,15 @@ class Classifier:
 
 	def __str__(self):
 		return "Parameters:\n{}".format(self.clf.get_params())
+
+	def run_prediction(self, label_encoder, test_data, file_name):
+		self.cv_scores()
+		print(str(self.clf))
+		y_pred = self.clf.predict(self.X_test)
+		y_pred = pd.Series(label_encoder.inverse_transform(y_pred))
+
+		NB_res = pd.DataFrame({'id': test_data['id'], 'cat': y_pred})
+		NB_res.to_csv('results/{}-results.csv'.format(file_name), index=False)
 
 
 def main():
@@ -112,26 +122,13 @@ def main():
 
 	if cfg['CLASSIFIER']['NAIVE-BAYES']['USE']:
 		print("\n===== NAIVE BAYES CLASSIFIER =====")
-		NB_clf = Classifier(MultinomialNB(alpha=cfg['CLASSIFIER']['NAIVE-BAYES']['ALPHA'], fit_prior=cfg['CLASSIFIER']['NAIVE-BAYES']['FIT-PRIOR']), X_train, y_train)
-		NB_clf.cv_scores()
-		print(str(NB_clf))
-		y_pred = NB_clf.predict(ip.X_test)
-		y_pred = pd.Series(ip.label_encoder.inverse_transform(y_pred))
-
-		NB_res = pd.DataFrame({'id': ip.test_data['id'], 'cat': y_pred})
-		NB_res.to_csv('results/Naive-Bayes-results.csv', index=False)
+		NB_clf = Classifier(MultinomialNB(alpha=cfg['CLASSIFIER']['NAIVE-BAYES']['ALPHA'], fit_prior=cfg['CLASSIFIER']['NAIVE-BAYES']['FIT-PRIOR']), X_train, y_train, ip.X_test)
+		NB_clf.run_prediction(ip.label_encoder, ip.test_data, 'Naive-Bayes')
 
 	if cfg['CLASSIFIER']['SVM']['USE']:
 		print("\n===== SVM CLASSIFIER =====")
-		SVM_clf = Classifier(SVC(kernel=cfg['CLASSIFIER']['SVM']['KERNEL'], C=cfg['CLASSIFIER']['SVM']['C']), X_train, y_train)
-		SVM_clf.cv_scores()
-		print(str(SVM_clf))
-		y_pred = SVM_clf.predict(ip.X_test)
-		y_pred = pd.Series(ip.label_encoder.inverse_transform(y_pred))
-
-		SVM_clf = pd.DataFrame({'id': ip.test_data['id'], 'cat': y_pred})
-		SVM_clf.to_csv('results/SVM-results.csv', index=False)
-	
+		SVM_clf = Classifier(SVC(kernel=cfg['CLASSIFIER']['SVM']['KERNEL'], C=cfg['CLASSIFIER']['SVM']['C']), X_train, y_train, ip.X_test)
+		SVM_clf.run_prediction(ip.label_encoder, ip.test_data, 'SVM')
 
 if __name__ == '__main__':
 	main()
