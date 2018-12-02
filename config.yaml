@@ -1,0 +1,20 @@
+DATA-PATH:
+  TRAIN: data/coggle_train.csv
+  TEST: data/coggle_test.csv
+
+PRE-PROCESS:
+  COUNT-VECTORIZE: True
+  TFIDF-VECTORIZE: False
+  REDUCE-DIM: False
+  ONE-HOT: False
+
+CLASSIFIER:
+  NAIVE-BAYES:
+    USE: True
+    ALPHA: 1.0
+    FIT-PRIOR: True
+
+  SVM:
+    USE: False
+    KERNEL: Linear
+    C: 1
