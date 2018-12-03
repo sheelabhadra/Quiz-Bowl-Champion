@@ -12,6 +12,8 @@ To generate the inference on the test data, go to the project root directory and
 python3 src/pipeline.py
 ```
 
+The result obtained after running inference in the test data is stored in the `results` folder. For example, the `Naive-Bayes-results.csv` file contains the results obtained using the Naive Bayes classifier with the header: [`id, cat`].  
+
 The path to the files, steps for data pre-processing (feature engineering), and the type of classifier can be specified using the `config.yaml` file. Currently, the implementation supports prediction only using the [Naive Bayes Classifier](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html).
 
 ## Data
